@@ -29,7 +29,13 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 from src.ce_model import CE_Classifier
 from src.data_loader import load_data
 from src.hinge_model import HingeClassifier
-from src.svm_models import train_linear_svm, train_rbf_svm
+from src.experiment_utils import (
+    EPOCHS as SHARED_EPOCHS,
+    FINAL_PARAMETERS as SHARED_FINAL_PARAMETERS,
+    MODEL_NAMES,
+    predict_original_labels,
+    train_final_model,
+)
 
 
 EPOCHS = 1000
@@ -43,6 +49,11 @@ FINAL_PARAMETERS = {
     "Hinge Loss": {"learning_rate": 0.4, "reg_lambda": 0.00003},
     "Cross-Entropy": {"learning_rate": 1.5, "reg_lambda": 0.00001},
 }
+
+
+# 最终参数的唯一有效来源为公共模块；本地旧定义保留仅为兼容历史文件结构。
+EPOCHS = SHARED_EPOCHS
+FINAL_PARAMETERS = SHARED_FINAL_PARAMETERS
 
 
 def plot_loss_curves(hinge_model, ce_model):
@@ -190,32 +201,15 @@ def main():
     # 最终训练使用合并后的训练集和验证集，测试集只在此处使用一次。
     X_full = np.concatenate([X_train, X_val], axis=0)
     y_full = np.concatenate([y_train, y_val], axis=0)
-    model_builders = {
-        "Linear SVM": lambda: train_linear_svm(X_full, y_full, FINAL_PARAMETERS["Linear SVM"]["C"]),
-        "RBF SVM": lambda: train_rbf_svm(
-            X_full,
-            y_full,
-            FINAL_PARAMETERS["RBF SVM"]["C"],
-            FINAL_PARAMETERS["RBF SVM"]["gamma"],
-        ),
-        "Hinge Loss": lambda: HingeClassifier(**FINAL_PARAMETERS["Hinge Loss"]).fit(
-            X_full, np.where(y_full == 9, 1, -1), epochs=EPOCHS
-        ),
-        "Cross-Entropy": lambda: CE_Classifier(**FINAL_PARAMETERS["Cross-Entropy"]).fit(
-            X_full, np.where(y_full == 9, 1, 0), epochs=EPOCHS
-        ),
-    }
-
     rows = []
-    for model_name, build_model in model_builders.items():
+    for model_name in MODEL_NAMES:
         start = perf_counter()
-        model = build_model()
+        model = train_final_model(model_name, X_full, y_full)
         train_seconds = perf_counter() - start
 
         start = perf_counter()
-        raw_prediction = model.predict(X_test)
+        prediction = predict_original_labels(model_name, model, X_test)
         prediction_seconds = perf_counter() - start
-        prediction = raw_prediction if "SVM" in model_name else np.where(raw_prediction == 1, 9, 8)
         errors_8_as_9 = int(np.sum((y_test == 8) & (prediction == 9)))
         errors_9_as_8 = int(np.sum((y_test == 9) & (prediction == 8)))
 

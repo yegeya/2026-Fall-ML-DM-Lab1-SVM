@@ -10,6 +10,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data" / "processed_8_9"
 
 
+def _prepare_features(images):
+    """将图像 Tensor 展平并归一化为 float32 特征矩阵。"""
+    return images.numpy().reshape(-1, 784).astype(np.float32) / 255.0
+
+
 def load_training_data():
     """加载全部原始训练样本，供重复验证等不应接触测试集的流程使用。"""
     train_data = torch.load(
@@ -18,7 +23,7 @@ def load_training_data():
         weights_only=True,
     )
     X_train, y_train = train_data
-    X_train = X_train.numpy().reshape(-1, 784).astype(np.float32) / 255.0
+    X_train = _prepare_features(X_train)
     y_train = y_train.numpy()
     return X_train, y_train
 
@@ -32,16 +37,12 @@ def load_data():
     y_test = y_test.numpy()
 
     # 将tensor转换成numpy数组
-    X_train = X_train.numpy()
-    X_test = X_test.numpy()
+    X_train = _prepare_features(X_train)
+    X_test = _prepare_features(X_test)
 
     # 将图像展平成784维向量
-    X_train = X_train.reshape(-1, 784)
-    X_test = X_test.reshape(-1, 784)
 
     # 将像素归一化到[0,1]
-    X_train = X_train.astype(np.float32)/255.0
-    X_test = X_test.astype(np.float32)/255.0 
 
     # 将原训练集划分为训练集和验证集
     X_train, X_val, y_train, y_val= train_test_split(

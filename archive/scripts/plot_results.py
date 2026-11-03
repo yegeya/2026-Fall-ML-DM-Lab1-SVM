@@ -1,5 +1,7 @@
 import os
 import csv
+import sys
+from pathlib import Path
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -15,11 +17,14 @@ from sklearn.metrics import (
     recall_score,
 )
 
-from data_loader import load_data
-from hinge_model import HingeClassifier
-from ce_model import CE_Classifier
-from hyperparameter_search import search_ce_grid, search_hinge_grid
-from svm_models import (
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.data_loader import load_data
+from src.hinge_model import HingeClassifier
+from src.ce_model import CE_Classifier
+from src.hyperparameter_search import search_ce_grid, search_hinge_grid
+from src.svm_models import (
     search_linear_svm_grid,
     search_rbf_svm_grid,
     train_linear_svm,

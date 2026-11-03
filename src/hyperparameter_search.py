@@ -1,6 +1,4 @@
-"""
-二维网格搜索工具：在验证集上联合选择学习率和 L2 正则化系数。
-"""
+# 二维网格搜索工具：在验证集上联合选择学习率和 L2 正则化系数。
 
 import numpy as np
 from sklearn.metrics import f1_score
