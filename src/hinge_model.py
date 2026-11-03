@@ -1,6 +1,6 @@
 # 此程序用以手动实现 Hinge loss 与梯度下降
 import numpy as np
-from data_loader import load_data
+from .data_loader import load_data
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 class HingeClassifier:

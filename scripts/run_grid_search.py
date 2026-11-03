@@ -11,6 +11,8 @@
 import argparse
 import csv
 import os
+import sys
+from pathlib import Path
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -19,9 +21,14 @@ os.environ["MKL_NUM_THREADS"] = "1"
 import matplotlib.pyplot as plt
 import numpy as np
 
-from data_loader import load_data
-from hyperparameter_search import search_ce_grid, search_hinge_grid
-from svm_models import search_linear_svm_grid, search_rbf_svm_grid
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
+RESULTS_DIR = PROJECT_ROOT / "results" / "tuning"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+from src.data_loader import load_data
+from src.hyperparameter_search import search_ce_grid, search_hinge_grid
+from src.svm_models import search_linear_svm_grid, search_rbf_svm_grid
 
 
 # Cross-Entropy 的上一轮最优学习率位于 1.0 的右边界，
@@ -127,14 +134,14 @@ def main():
         if args.ce_final_check:
             learning_rates = CE_FINAL_LEARNING_RATES
             reg_lambdas = CE_FINAL_REG_LAMBDAS
-            csv_path = "Cross Entropy Final Check.csv"
-            figure_path = "Cross Entropy Final Check.png"
+            csv_path = RESULTS_DIR / "Cross Entropy Final Check.csv"
+            figure_path = RESULTS_DIR / "Cross Entropy Final Check.png"
             figure_title = "Cross-Entropy Final Learning-rate Check"
         else:
             learning_rates = CE_BOUNDARY_LEARNING_RATES
             reg_lambdas = CE_BOUNDARY_REG_LAMBDAS
-            csv_path = "Cross Entropy Boundary Search.csv"
-            figure_path = "Cross Entropy Boundary Search.png"
+            csv_path = RESULTS_DIR / "Cross Entropy Boundary Search.csv"
+            figure_path = RESULTS_DIR / "Cross Entropy Boundary Search.png"
             figure_title = "Cross-Entropy Boundary Grid Search"
 
         result = search_ce_grid(
@@ -154,19 +161,19 @@ def main():
             X_val, np.where(y_val == 9, 1, -1),
             HINGE_LEARNING_RATES, HINGE_REG_LAMBDAS, args.epochs,
         )
-        save_manual_result(result, "Hinge Loss", "Hinge Loss Grid Search.csv")
-        plot_manual_heatmap(result, "Hinge Loss Grid Search", "Hinge Loss Grid Search.png")
+        save_manual_result(result, "Hinge Loss", RESULTS_DIR / "Hinge Loss Grid Search.csv")
+        plot_manual_heatmap(result, "Hinge Loss Grid Search", RESULTS_DIR / "Hinge Loss Grid Search.png")
         print(
             f"\nBest Hinge Loss parameters: learning_rate={result['best_learning_rate']}, "
             f"reg_lambda={result['best_reg_lambda']}, validation_f1={result['best_f1']:.6f}"
         )
     elif args.model == "linear_svm":
         result = search_linear_svm_grid(X_train, y_train, X_val, y_val, SVM_C_VALUES)
-        save_svm_result(result, "Linear SVM", "Linear SVM Grid Search.csv")
+        save_svm_result(result, "Linear SVM", RESULTS_DIR / "Linear SVM Grid Search.csv")
         print(f"\nBest Linear SVM parameters: C={result['best_c']}, validation_f1={result['best_f1']:.6f}")
     else:
         result = search_rbf_svm_grid(X_train, y_train, X_val, y_val, SVM_C_VALUES, RBF_GAMMA_VALUES)
-        save_svm_result(result, "RBF SVM", "RBF SVM Grid Search.csv", has_gamma=True)
+        save_svm_result(result, "RBF SVM", RESULTS_DIR / "RBF SVM Grid Search.csv", has_gamma=True)
         print(
             f"\nBest RBF SVM parameters: C={result['best_c']}, gamma={result['best_gamma']}, "
             f"validation_f1={result['best_f1']:.6f}"

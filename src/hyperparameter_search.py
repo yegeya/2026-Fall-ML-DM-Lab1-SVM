@@ -5,8 +5,8 @@
 import numpy as np
 from sklearn.metrics import f1_score
 
-from ce_model import CE_Classifier
-from hinge_model import HingeClassifier
+from .ce_model import CE_Classifier
+from .hinge_model import HingeClassifier
 
 
 def _run_grid_search(model_class, X_train, y_train, X_val, y_val,

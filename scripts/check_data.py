@@ -4,7 +4,8 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
-DATA_DIR = Path("data/processed_8_9")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = PROJECT_ROOT / "data" / "processed_8_9"
 
 
 def load_dataset(path):

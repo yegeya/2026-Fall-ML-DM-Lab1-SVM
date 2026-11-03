@@ -2,7 +2,7 @@
 # 此程序中可以直接调用sklearn的包
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score, confusion_matrix
-from data_loader import load_data
+from .data_loader import load_data
 import numpy as np
 
 def train_linear_svm(X_train, y_train, c_value):

@@ -8,11 +8,4 @@ data/
 processed_8_9.zip
 
 # Superseded exploratory outputs; current report uses the newer figures below.
-Confusion_Matrices.png
-F1 Score Grid Search.png
-F1 Score with Learning Rate.png
-F1 Score with Reg Lambda.png
-Hyperparameter Search Results.csv
-Loss.png
-main.png
-Model_Performance_Line.png
+archive/legacy_outputs/

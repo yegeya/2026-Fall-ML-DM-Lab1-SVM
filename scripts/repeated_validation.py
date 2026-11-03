@@ -6,7 +6,9 @@
 
 import csv
 import os
+import sys
 from collections import defaultdict
+from pathlib import Path
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -17,10 +19,15 @@ import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 
-from ce_model import CE_Classifier
-from data_loader import load_training_data
-from hinge_model import HingeClassifier
-from svm_models import train_linear_svm, train_rbf_svm
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
+RESULTS_DIR = PROJECT_ROOT / "results" / "final"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+from src.ce_model import CE_Classifier
+from src.data_loader import load_training_data
+from src.hinge_model import HingeClassifier
+from src.svm_models import train_linear_svm, train_rbf_svm
 
 
 RANDOM_SEEDS = [23, 42, 123, 2024, 2025]
@@ -66,12 +73,12 @@ def predict_original_labels(model_name, model, X_val):
 
 
 def save_csv(rows, summary_rows):
-    with open("Repeated Validation Results.csv", "w", newline="", encoding="utf-8-sig") as file:
+    with open(RESULTS_DIR / "Repeated Validation Results.csv", "w", newline="", encoding="utf-8-sig") as file:
         writer = csv.DictWriter(file, fieldnames=rows[0].keys())
         writer.writeheader()
         writer.writerows(rows)
 
-    with open("Repeated Validation Summary.csv", "w", newline="", encoding="utf-8-sig") as file:
+    with open(RESULTS_DIR / "Repeated Validation Summary.csv", "w", newline="", encoding="utf-8-sig") as file:
         writer = csv.DictWriter(file, fieldnames=summary_rows[0].keys())
         writer.writeheader()
         writer.writerows(summary_rows)
@@ -100,7 +107,7 @@ def plot_f1_stability(summary_rows):
             fontsize=9,
         )
     figure.tight_layout()
-    figure.savefig("Repeated Validation F1 Stability.png", dpi=300, bbox_inches="tight")
+    figure.savefig(RESULTS_DIR / "Repeated Validation F1 Stability.png", dpi=300, bbox_inches="tight")
     plt.show()
 
 

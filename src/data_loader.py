@@ -3,12 +3,17 @@
 from sklearn.model_selection import train_test_split
 import torch
 import numpy as np 
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_DIR = PROJECT_ROOT / "data" / "processed_8_9"
 
 
 def load_training_data():
     """加载全部原始训练样本，供重复验证等不应接触测试集的流程使用。"""
     train_data = torch.load(
-        "data/processed_8_9/training.pt",
+        DATA_DIR / "training.pt",
         map_location="cpu",
         weights_only=True,
     )
@@ -18,8 +23,8 @@ def load_training_data():
     return X_train, y_train
 
 def load_data():
-    train_data = torch.load("data/processed_8_9/training.pt", map_location="cpu",weights_only=True)
-    test_data = torch.load("data/processed_8_9/test.pt",map_location="cpu", weights_only=True)
+    train_data = torch.load(DATA_DIR / "training.pt", map_location="cpu",weights_only=True)
+    test_data = torch.load(DATA_DIR / "test.pt",map_location="cpu", weights_only=True)
 
     X_train, y_train = train_data
     X_test, y_test = test_data

@@ -9,6 +9,8 @@
 
 import csv
 import os
+import sys
+from pathlib import Path
 from time import perf_counter
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
@@ -19,10 +21,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-from ce_model import CE_Classifier
-from data_loader import load_data
-from hinge_model import HingeClassifier
-from svm_models import train_linear_svm, train_rbf_svm
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
+RESULTS_DIR = PROJECT_ROOT / "results" / "final"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+from src.ce_model import CE_Classifier
+from src.data_loader import load_data
+from src.hinge_model import HingeClassifier
+from src.svm_models import train_linear_svm, train_rbf_svm
 
 
 EPOCHS = 1000
@@ -62,7 +69,7 @@ def plot_loss_curves(hinge_model, ce_model):
             axis.legend()
 
     figure.tight_layout()
-    figure.savefig("Loss Curves Full and Zoomed.png", dpi=300, bbox_inches="tight")
+    figure.savefig(RESULTS_DIR / "Loss Curves Full and Zoomed.png", dpi=300, bbox_inches="tight")
     plt.show()
 
 
@@ -97,13 +104,13 @@ def plot_misclassified_samples(model_name, X_test, y_true, y_pred):
     )
     figure.tight_layout(rect=(0, 0, 1, 0.94))
     filename = f"Misclassified Samples {model_name.replace('-', ' ')}.png"
-    figure.savefig(filename, dpi=300, bbox_inches="tight")
+    figure.savefig(RESULTS_DIR / filename, dpi=300, bbox_inches="tight")
     plt.show()
 
 
 def save_final_results(rows):
     """保存测试集指标和时间统计，便于直接插入实验报告表格。"""
-    with open("Final Test Results and Timing.csv", "w", newline="", encoding="utf-8-sig") as file:
+    with open(RESULTS_DIR / "Final Test Results and Timing.csv", "w", newline="", encoding="utf-8-sig") as file:
         writer = csv.DictWriter(file, fieldnames=rows[0].keys())
         writer.writeheader()
         writer.writerows(rows)
@@ -130,7 +137,7 @@ def plot_training_time(rows):
     # 训练耗时可由柱高直接比较；仅标注相差较大的预测耗时，避免与标题重叠。
     axis.bar_label(prediction_bars, fmt="%.4g s", padding=3, rotation=90, fontsize=8)
     figure.tight_layout()
-    figure.savefig("Training and Prediction Time.png", dpi=300, bbox_inches="tight")
+    figure.savefig(RESULTS_DIR / "Training and Prediction Time.png", dpi=300, bbox_inches="tight")
     plt.show()
 
 
@@ -154,7 +161,7 @@ def plot_misclassification_counts(rows):
     axis.bar_label(bars_8_to_9, padding=3)
     axis.bar_label(bars_9_to_8, padding=3)
     figure.tight_layout()
-    figure.savefig("Misclassification Counts.png", dpi=300, bbox_inches="tight")
+    figure.savefig(RESULTS_DIR / "Misclassification Counts.png", dpi=300, bbox_inches="tight")
     plt.show()
 
 
