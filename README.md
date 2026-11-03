@@ -16,6 +16,14 @@
 
 推荐环境：Python 3.13.12、NumPy 1.26.4、PyTorch 2.12.0+cu126、Scikit-learn 1.8.0、Matplotlib 3.10.9。
 
+可在虚拟环境中安装项目依赖：
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+`requirements.txt` 固定了本实验使用的 CUDA 12.6 PyTorch 构建；没有对应 CUDA 环境时，应按 PyTorch 官方安装说明选择 CPU 或匹配的 CUDA 版本。
+
 将教师提供的 `training.pt` 与 `test.pt` 放在以下位置：
 
 ```text

@@ -30,30 +30,16 @@ from src.ce_model import CE_Classifier
 from src.data_loader import load_data
 from src.hinge_model import HingeClassifier
 from src.experiment_utils import (
-    EPOCHS as SHARED_EPOCHS,
-    FINAL_PARAMETERS as SHARED_FINAL_PARAMETERS,
+    EPOCHS,
+    FINAL_PARAMETERS,
     MODEL_NAMES,
-    predict_original_labels,
+    restore_original_labels,
     train_final_model,
 )
 
 
-EPOCHS = 1000
 ZOOM_START_EPOCH = 50
 ERROR_SAMPLES_PER_ROW = 6
-
-# 所有参数均已通过训练集内部的验证集选择，测试集仅用于最终一次评估。
-FINAL_PARAMETERS = {
-    "Linear SVM": {"C": 0.1},
-    "RBF SVM": {"C": 10, "gamma": "scale"},
-    "Hinge Loss": {"learning_rate": 0.4, "reg_lambda": 0.00003},
-    "Cross-Entropy": {"learning_rate": 1.5, "reg_lambda": 0.00001},
-}
-
-
-# 最终参数的唯一有效来源为公共模块；本地旧定义保留仅为兼容历史文件结构。
-EPOCHS = SHARED_EPOCHS
-FINAL_PARAMETERS = SHARED_FINAL_PARAMETERS
 
 
 def plot_loss_curves(hinge_model, ce_model):
@@ -208,8 +194,9 @@ def main():
         train_seconds = perf_counter() - start
 
         start = perf_counter()
-        prediction = predict_original_labels(model_name, model, X_test)
+        raw_prediction = model.predict(X_test)
         prediction_seconds = perf_counter() - start
+        prediction = restore_original_labels(model_name, raw_prediction)
         errors_8_as_9 = int(np.sum((y_test == 8) & (prediction == 9)))
         errors_9_as_8 = int(np.sum((y_test == 9) & (prediction == 8)))
 

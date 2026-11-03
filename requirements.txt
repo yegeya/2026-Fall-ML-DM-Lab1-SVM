@@ -1,0 +1,9 @@
+# 本实验的核心 Python 依赖（对应实验报告中的运行环境）。
+numpy==1.26.4
+scikit-learn==1.8.0
+matplotlib==3.10.9
+
+# 本机实验环境使用 CUDA 12.6 构建的 PyTorch。
+# 若复现环境不具备 CUDA 12.6，请按 PyTorch 官方说明替换为对应的 CPU 或 CUDA 安装包。
+--extra-index-url https://download.pytorch.org/whl/cu126
+torch==2.12.0+cu126

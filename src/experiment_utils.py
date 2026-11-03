@@ -48,9 +48,13 @@ def train_all_final_models(X_train, y_train):
     return {name: train_final_model(name, X_train, y_train) for name in MODEL_NAMES}
 
 
-def predict_original_labels(model_name, model, X):
+def restore_original_labels(model_name, prediction):
     """将各模型的内部预测标签统一还原为原始数字标签 8、9。"""
-    prediction = model.predict(X)
     if "SVM" in model_name:
         return prediction
     return np.where(prediction == 1, 9, 8)
+
+
+def predict_original_labels(model_name, model, X):
+    """执行预测并将输出统一还原为原始数字标签 8、9。"""
+    return restore_original_labels(model_name, model.predict(X))
